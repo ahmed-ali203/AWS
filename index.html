@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ahmed Ali — DevOps Engineer</title>
+<style>
+  :root{
+    --bg: #0d1117;
+    --bg-raised: #131a22;
+    --line: #1f2933;
+    --text: #dfe6ec;
+    --text-dim: #7d8b98;
+    --amber: #f0a848;
+    --green: #4fd68a;
+    --mono: 'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, Menlo, monospace;
+    --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html{ scroll-behavior:smooth; }
+
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--sans);
+    line-height:1.6;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size:48px 48px;
+    background-attachment:fixed;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; scroll-behavior:auto !important; }
+  }
+
+  a{ color:inherit; text-decoration:none; }
+  .mono{ font-family:var(--mono); }
+
+  /* ---------- Pipeline nav ---------- */
+  .pipeline-nav{
+    position:sticky; top:0; z-index:50;
+    display:flex; align-items:center; gap:0;
+    background:rgba(13,17,23,0.85);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+    padding:0 24px;
+    overflow-x:auto;
+  }
+  .pipeline-nav .brand{
+    font-family:var(--mono); font-weight:600; color:var(--green);
+    padding:16px 20px 16px 0; white-space:nowrap; font-size:14px;
+  }
+  .pipeline-nav .stage{
+    font-family:var(--mono); font-size:13px; color:var(--text-dim);
+    padding:16px 14px; white-space:nowrap; position:relative;
+    display:flex; align-items:center; gap:8px;
+  }
+  .pipeline-nav .stage:hover{ color:var(--text); }
+  .pipeline-nav .stage::before{
+    content:''; width:6px; height:6px; border-radius:50%;
+    background:var(--text-dim); flex-shrink:0;
+  }
+  .pipeline-nav .stage:hover::before{ background:var(--green); }
+  .pipeline-nav .connector{ color:var(--line); font-size:12px; }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    max-width:900px; margin:0 auto; padding:120px 24px 100px;
+  }
+  .hero .eyebrow{
+    font-family:var(--mono); font-size:13px; color:var(--green);
+    display:flex; align-items:center; gap:10px; margin-bottom:24px;
+  }
+  .hero .eyebrow .dot{
+    width:8px; height:8px; border-radius:50%; background:var(--green);
+    box-shadow:0 0 0 4px rgba(79,214,138,0.15);
+    animation:pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse{
+    0%,100%{ box-shadow:0 0 0 4px rgba(79,214,138,0.15); }
+    50%{ box-shadow:0 0 0 8px rgba(79,214,138,0.05); }
+  }
+  .hero h1{
+    font-size:clamp(2.4rem, 6vw, 4rem);
+    font-weight:700; letter-spacing:-0.02em; line-height:1.05;
+    margin-bottom:20px;
+  }
+  .hero h1 .accent{ color:var(--amber); }
+  .hero p.lede{
+    font-size:1.15rem; color:var(--text-dim); max-width:600px; margin-bottom:36px;
+  }
+  .hero .cta-row{ display:flex; gap:14px; flex-wrap:wrap; }
+  .btn{
+    font-family:var(--mono); font-size:14px; padding:12px 22px;
+    border-radius:6px; border:1px solid var(--line); transition:all .2s ease;
+    display:inline-flex; align-items:center; gap:8px;
+  }
+  .btn-primary{ background:var(--green); color:#08130d; border-color:var(--green); font-weight:600; }
+  .btn-primary:hover{ background:#3cc27a; }
+  .btn-ghost:hover{ border-color:var(--text-dim); background:var(--bg-raised); }
+
+  .terminal{
+    margin-top:60px; background:var(--bg-raised); border:1px solid var(--line);
+    border-radius:10px; overflow:hidden; box-shadow:0 20px 60px -20px rgba(0,0,0,0.6);
+  }
+  .terminal .bar{
+    display:flex; align-items:center; gap:8px; padding:12px 16px;
+    border-bottom:1px solid var(--line);
+  }
+  .terminal .bar span{ width:11px; height:11px; border-radius:50%; }
+  .terminal .bar span:nth-child(1){ background:#ff5f56; }
+  .terminal .bar span:nth-child(2){ background:#ffbd2e; }
+  .terminal .bar span:nth-child(3){ background:#27c93f; }
+  .terminal .body{ padding:20px 22px; font-family:var(--mono); font-size:13.5px; color:var(--text-dim); }
+  .terminal .body .line{ margin-bottom:6px; }
+  .terminal .prompt{ color:var(--green); }
+  .terminal .ok{ color:var(--green); }
+  .terminal .path{ color:var(--amber); }
+  .cursor{ display:inline-block; width:7px; height:14px; background:var(--green); vertical-align:middle; animation:blink 1s step-end infinite; }
+  @keyframes blink{ 50%{ opacity:0; } }
+
+  /* ---------- Section shell ---------- */
+  section{ max-width:900px; margin:0 auto; padding:80px 24px; border-top:1px solid var(--line); }
+  .section-head{ display:flex; align-items:baseline; gap:16px; margin-bottom:40px; }
+  .section-head .stage-tag{
+    font-family:var(--mono); font-size:12px; color:var(--bg);
+    background:var(--green); padding:3px 10px; border-radius:4px; font-weight:700;
+  }
+  .section-head h2{ font-size:1.8rem; font-weight:700; letter-spacing:-0.01em; }
+  .section-head .status{ margin-left:auto; font-family:var(--mono); font-size:12px; color:var(--text-dim); }
+
+  /* ---------- About ---------- */
+  .about-grid{ display:grid; grid-template-columns:1.3fr 1fr; gap:48px; }
+  .about-grid p{ color:var(--text-dim); margin-bottom:16px; }
+  .fact-list{ font-family:var(--mono); font-size:13.5px; }
+  .fact-list dt{ color:var(--text-dim); margin-top:14px; }
+  .fact-list dd{ color:var(--text); margin-left:0; }
+  @media (max-width:720px){ .about-grid{ grid-template-columns:1fr; } }
+
+  /* ---------- Stack / skills ---------- */
+  .stack-groups{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:24px; }
+  .stack-card{
+    background:var(--bg-raised); border:1px solid var(--line); border-radius:10px; padding:22px;
+  }
+  .stack-card h3{ font-family:var(--mono); font-size:13px; color:var(--amber); margin-bottom:14px; letter-spacing:0.02em; }
+  .chip-row{ display:flex; flex-wrap:wrap; gap:8px; }
+  .chip{
+    font-family:var(--mono); font-size:12.5px; padding:5px 10px; border-radius:5px;
+    border:1px solid var(--line); color:var(--text-dim);
+  }
+
+  /* ---------- Projects ---------- */
+  .project{
+    display:grid; grid-template-columns:44px 1fr; gap:20px;
+    padding:26px 0; border-bottom:1px solid var(--line);
+  }
+  .project:last-child{ border-bottom:none; }
+  .project .idx{ font-family:var(--mono); color:var(--green); font-size:13px; padding-top:4px; }
+  .project h3{ font-size:1.2rem; margin-bottom:8px; }
+  .project p{ color:var(--text-dim); margin-bottom:12px; max-width:640px; }
+  .project .chip-row .chip{ font-size:11.5px; }
+  .project .metric{ font-family:var(--mono); color:var(--amber); font-size:12.5px; margin-top:8px; }
+
+  /* ---------- Experience timeline ---------- */
+  .timeline{ position:relative; padding-left:28px; }
+  .timeline::before{ content:''; position:absolute; left:5px; top:6px; bottom:6px; width:1px; background:var(--line); }
+  .tl-item{ position:relative; margin-bottom:34px; }
+  .tl-item::before{
+    content:''; position:absolute; left:-28px; top:5px; width:11px; height:11px;
+    border-radius:50%; background:var(--bg); border:2px solid var(--green);
+  }
+  .tl-item .role{ font-weight:600; font-size:1.05rem; }
+  .tl-item .org{ color:var(--amber); font-family:var(--mono); font-size:13px; }
+  .tl-item .period{ color:var(--text-dim); font-family:var(--mono); font-size:12.5px; margin-bottom:8px; display:block; }
+  .tl-item p{ color:var(--text-dim); }
+
+  /* ---------- Contact / footer ---------- */
+  .contact-panel{
+    background:var(--bg-raised); border:1px solid var(--line); border-radius:10px;
+    padding:40px; text-align:center;
+  }
+  .contact-panel h2{ font-size:1.9rem; margin-bottom:12px; }
+  .contact-panel p{ color:var(--text-dim); margin-bottom:28px; }
+  .contact-links{ display:flex; justify-content:center; gap:14px; flex-wrap:wrap; }
+
+  footer{ text-align:center; padding:36px 24px 60px; font-family:var(--mono); font-size:12px; color:var(--text-dim); }
+  footer .ok{ color:var(--green); }
+</style>
+</head>
+<body>
+
+  <nav class="pipeline-nav">
+    <a href="#top" class="brand">ahmedali@devops:~$</a>
+    <a href="#about" class="stage">about</a><span class="connector">→</span>
+    <a href="#stack" class="stage">stack</a><span class="connector">→</span>
+    <a href="#projects" class="stage">projects</a><span class="connector">→</span>
+    <a href="#experience" class="stage">experience</a><span class="connector">→</span>
+    <a href="#contact" class="stage">deploy</a>
+  </nav>
+
+  <main id="top">
+    <section class="hero" style="border-top:none;">
+      <div class="eyebrow"><span class="dot"></span> pipeline status: passing</div>
+      <h1>Ahmed Ali builds the<br>infrastructure <span class="accent">nobody notices —</span><br>until it breaks.</h1>
+      <p class="lede">DevOps engineer focused on reliable delivery pipelines, infrastructure as code, and systems that scale quietly. I turn manual deploys into one-command releases.</p>
+      <div class="cta-row">
+        <a href="#projects" class="btn btn-primary">→ view_projects()</a>
+        <a href="#contact" class="btn btn-ghost">get_in_touch --now</a>
+      </div>
+
+      <div class="terminal">
+        <div class="bar"><span></span><span></span><span></span></div>
+        <div class="body">
+          <div class="line"><span class="prompt">$</span> whoami</div>
+          <div class="line">ahmed — devops engineer, infrastructure &amp; automation</div>
+          <div class="line"><span class="prompt">$</span> ./deploy.sh --env production</div>
+          <div class="line">Building image ......................... <span class="ok">done</span></div>
+          <div class="line">Running test suite ...................... <span class="ok">42 passed</span></div>
+          <div class="line">Provisioning infra <span class="path">(terraform apply)</span> .... <span class="ok">done</span></div>
+          <div class="line">Rolling out to cluster .................. <span class="ok">3/3 pods healthy</span></div>
+          <div class="line">Deployment successful. Zero downtime.<span class="cursor"></span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="about">
+      <div class="section-head">
+        <span class="stage-tag">01</span>
+        <h2>About</h2>
+        <span class="status">stage: about</span>
+      </div>
+      <div class="about-grid">
+        <div>
+          <p>I'm Ahmed Ali, a DevOps engineer who cares less about the tools in the stack and more about the outcome: teams that ship confidently, systems that recover on their own, and infrastructure that's documented in code instead of someone's memory.</p>
+          <p>My day-to-day sits at the intersection of automation, cloud infrastructure, and reliability — writing the pipelines, provisioning the environments, and building the guardrails that let developers move fast without breaking things.</p>
+          <p>Off the clock, I'm usually breaking my own homelab on purpose, just to practice fixing it.</p>
+        </div>
+        <dl class="fact-list">
+          <dt>Focus</dt><dd>CI/CD, IaC, cloud infrastructure</dd>
+          <dt>Primary cloud</dt><dd>AWS</dd>
+          <dt>Currently exploring</dt><dd>GitOps &amp; progressive delivery</dd>
+          <dt>Based</dt><dd>Remote-friendly</dd>
+        </dl>
+      </div>
+    </section>
+
+    <section id="stack">
+      <div class="section-head">
+        <span class="stage-tag">02</span>
+        <h2>Stack</h2>
+        <span class="status">stage: build</span>
+      </div>
+      <div class="stack-groups">
+        <div class="stack-card">
+          <h3>CLOUD &amp; INFRA</h3>
+          <div class="chip-row">
+            <span class="chip">AWS</span><span class="chip">Terraform</span>
+            <span class="chip">CloudFormation</span><span class="chip">VPC / networking</span>
+          </div>
+        </div>
+        <div class="stack-card">
+          <h3>CONTAINERS &amp; ORCHESTRATION</h3>
+          <div class="chip-row">
+            <span class="chip">Docker</span><span class="chip">Kubernetes</span>
+            <span class="chip">Helm</span><span class="chip">ECS</span>
+          </div>
+        </div>
+        <div class="stack-card">
+          <h3>CI / CD</h3>
+          <div class="chip-row">
+            <span class="chip">GitHub Actions</span><span class="chip">Jenkins</span>
+            <span class="chip">GitLab CI</span><span class="chip">ArgoCD</span>
+          </div>
+        </div>
+        <div class="stack-card">
+          <h3>OBSERVABILITY</h3>
+          <div class="chip-row">
+            <span class="chip">Prometheus</span><span class="chip">Grafana</span>
+            <span class="chip">CloudWatch</span><span class="chip">ELK</span>
+          </div>
+        </div>
+        <div class="stack-card">
+          <h3>SCRIPTING &amp; CONFIG</h3>
+          <div class="chip-row">
+            <span class="chip">Bash</span><span class="chip">Python</span>
+            <span class="chip">Ansible</span><span class="chip">YAML</span>
+          </div>
+        </div>
+        <div class="stack-card">
+          <h3>PRACTICES</h3>
+          <div class="chip-row">
+            <span class="chip">GitOps</span><span class="chip">Blue/Green</span>
+            <span class="chip">On-call</span><span class="chip">SLOs</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="projects">
+      <div class="section-head">
+        <span class="stage-tag">03</span>
+        <h2>Projects</h2>
+        <span class="status">stage: test</span>
+      </div>
+
+      <div class="project">
+        <div class="idx">01</div>
+        <div>
+          <h3>Zero-downtime deployment pipeline</h3>
+          <p>Designed a blue/green CI/CD pipeline on AWS ECS with automated rollback on failed health checks, replacing a manual, ticket-based release process.</p>
+          <div class="chip-row">
+            <span class="chip">GitHub Actions</span><span class="chip">ECS</span><span class="chip">Terraform</span>
+          </div>
+          <div class="metric">→ Reduced deployment time from ~45 min to under 6 min</div>
+        </div>
+      </div>
+
+      <div class="project">
+        <div class="idx">02</div>
+        <div>
+          <h3>Infrastructure as code migration</h3>
+          <p>Rebuilt hand-configured AWS environments as versioned Terraform modules, with per-environment state and peer-reviewed change plans.</p>
+          <div class="chip-row">
+            <span class="chip">Terraform</span><span class="chip">AWS</span><span class="chip">S3 remote state</span>
+          </div>
+          <div class="metric">→ Eliminated config drift across dev / staging / prod</div>
+        </div>
+      </div>
+
+      <div class="project">
+        <div class="idx">03</div>
+        <div>
+          <h3>Cluster observability overhaul</h3>
+          <p>Stood up a Prometheus + Grafana monitoring stack with alerting thresholds tied to real SLOs, replacing ad-hoc log grepping during incidents.</p>
+          <div class="chip-row">
+            <span class="chip">Prometheus</span><span class="chip">Grafana</span><span class="chip">Kubernetes</span>
+          </div>
+          <div class="metric">→ Cut mean-time-to-detect from hours to minutes</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="experience">
+      <div class="section-head">
+        <span class="stage-tag">04</span>
+        <h2>Experience</h2>
+        <span class="status">stage: verify</span>
+      </div>
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="role">DevOps Engineer</div>
+          <div class="org">// current role</div>
+          <span class="period">Present</span>
+          <p>Own CI/CD pipelines and cloud infrastructure end to end — from Terraform modules to on-call rotations.</p>
+        </div>
+        <div class="tl-item">
+          <div class="role">Infrastructure &amp; Automation</div>
+          <div class="org">// earlier work</div>
+          <span class="period">Previously</span>
+          <p>Built the automation and monitoring foundations that later releases were deployed on top of.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact">
+      <div class="section-head">
+        <span class="stage-tag">05</span>
+        <h2>Deploy</h2>
+        <span class="status">stage: release</span>
+      </div>
+      <div class="contact-panel">
+        <h2>Let's ship something reliable.</h2>
+        <p>Open to DevOps &amp; infrastructure roles, freelance pipeline work, or just talking shop about Terraform.</p>
+        <div class="contact-links">
+          <a href="mailto:ahmedali@example.com" class="btn btn-primary">email_me()</a>
+          <a href="#" class="btn btn-ghost">github</a>
+          <a href="#" class="btn btn-ghost">linkedin</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span class="ok">✓</span> build passed · deployed via S3 static hosting · © <span id="year"></span> Ahmed Ali
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
